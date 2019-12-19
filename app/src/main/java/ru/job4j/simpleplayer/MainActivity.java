@@ -2,6 +2,8 @@ package ru.job4j.simpleplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.view.View;
@@ -13,13 +15,18 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaPlayer media;
     private Spinner spinner;
-
     private Store soundStore;
+    private Uri audioUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            audioUri = intent.getData();
+        }
 
         soundStore = new SoundStore();
 
@@ -28,13 +35,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    media = MediaPlayer.create(MainActivity.this, soundStore.getIdByName(spinner.getSelectedItem().toString()));
+                    if (audioUri != null) {
+                        media = MediaPlayer.create(MainActivity.this, audioUri);
+                    } else {
+                        media = MediaPlayer.create(MainActivity.this, soundStore.getIdByName(spinner.getSelectedItem().toString()));
+                    }
                     media.start();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
+
         Button stop = findViewById(R.id.stop);
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
